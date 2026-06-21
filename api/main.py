@@ -7,13 +7,14 @@ from PIL import Image
 import tensorflow as tf
 import os
 
-# ✅ FIXED IMPORT
+# ✅ CORRECT MODERN IMPORT
 from tensorflow.keras.utils import img_to_array
 
 
+# ✅ CREATE APP
 app = FastAPI()
 
-# ✅ CORS
+# ✅ CORS SETTINGS
 origins = [
     "http://localhost",
     "http://localhost:3000",
@@ -27,35 +28,35 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ✅ MODEL LOAD
+# ✅ LOAD MODEL
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, "..", "saved_models", "1")
 
 MODEL = tf.keras.models.load_model(MODEL_PATH)
 CLASS_NAMES = ["Early Blight", "Late Blight", "Healthy"]
 
-# ✅ HEALTH CHECK
+# ✅ TEST ROUTE
 @app.get("/ping")
 async def ping():
     return {"message": "API working"}
 
 
-# ✅ IMAGE PROCESS (FIXED PROPERLY)
+# ✅ IMAGE PREPROCESSING (FIXED)
 def read_file_as_image(data) -> np.ndarray:
     img = Image.open(BytesIO(data)).convert("RGB")
     img = img.resize((256, 256))
 
-    img_array = img_to_array(img)   # ✅ correct method
-    img_array = img_array / 255.0   # ✅ normalization
+    img_array = img_to_array(img)    # ✅ correct conversion
+    img_array = img_array / 255.0    # ✅ normalization
 
     return img_array
 
 
-# ✅ PREDICT API (CRITICAL FIX HERE)
+# ✅ PREDICTION API (FIXED)
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
-    img = read_file_as_image(await file.read())   # ✅ correct variable
-    img_batch = np.expand_dims(img, 0)            # ✅ correct batching
+    img = read_file_as_image(await file.read())  # ✅ DO NOT overwrite tf
+    img_batch = np.expand_dims(img, 0)           # ✅ correct batching
 
     predictions = MODEL.predict(img_batch)
 
@@ -71,4 +72,3 @@ async def predict(file: UploadFile = File(...)):
 # ✅ RUN SERVER
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
-``
