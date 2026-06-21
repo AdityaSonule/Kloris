@@ -1,79 +1,67 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useDropzone } from "react-dropzone";
 
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import Avatar from "@mui/material/Avatar";
-import Container from "@mui/material/Container";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
-import Grid from "@mui/material/Grid";
-import Button from "@mui/material/Button";
-import CircularProgress from "@mui/material/CircularProgress";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Container,
+  Card,
+  CardContent,
+  Grid,
+  Button,
+  CircularProgress,
+} from "@mui/material";
 
 export const ImageUpload = () => {
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [data, setData] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  // ✅ Send image to backend
-  const sendFile = async () => {
-    if (!selectedFile) return;
-
-    const formData = new FormData();
-    formData.append("file", selectedFile);
-
-    try {
-      const res = await axios.post(
-        process.env.REACT_APP_API_URL,
-        formData
-      );
-
-      console.log(res.data); // ✅ debug
-      setData(res.data);
-    } catch (error) {
-      console.error(error);
-    }
-
-    setIsLoading(false);
+  // ✅ Dropzone
+  const onDrop = (acceptedFiles) => {
+    const selected = acceptedFiles[0];
+    setFile(selected);
+    setPreview(URL.createObjectURL(selected));
+    setData(null);
   };
 
-  // ✅ Create preview
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    accept: { "image/*": [] },
+  });
+
+  // ✅ Send to backend
   useEffect(() => {
-    if (!selectedFile) return;
+    const sendFile = async () => {
+      if (!file) return;
 
-    const objectUrl = URL.createObjectURL(selectedFile);
-    setPreview(objectUrl);
-  }, [selectedFile]);
+      setLoading(true);
+      const formData = new FormData();
+      formData.append("file", file);
 
-  // ✅ Trigger prediction
-  useEffect(() => {
-    if (!preview) return;
+      try {
+        const res = await axios.post(
+          process.env.REACT_APP_API_URL,
+          formData
+        );
+        setData(res.data);
+      } catch (err) {
+        console.error(err);
+      }
 
-    setIsLoading(true);
+      setLoading(false);
+    };
+
     sendFile();
-  }, [preview]);
-
-  // ✅ File select
-  const handleFileChange = (event) => {
-    setSelectedFile(event.target.files[0]);
-    setData(null);
-  };
-
-  // ✅ Clear everything
-  const clearData = () => {
-    setSelectedFile(null);
-    setPreview(null);
-    setData(null);
-  };
+  }, [file]);
 
   return (
     <div>
-      {/* Top header */}
-      <AppBar position="static" style={{ background: "#be6a77" }}>
+      {/* HEADER */}
+      <AppBar position="static" style={{ background: "#b35f6a" }}>
         <Toolbar>
           <Typography variant="h6">
             Potato Disease Classification
@@ -81,63 +69,88 @@ export const ImageUpload = () => {
         </Toolbar>
       </AppBar>
 
-      {/* Main section */}
+      {/* BACKGROUND */}
       <Container
         maxWidth={false}
         style={{
-          backgroundColor: "#f5f5f5",
+          backgroundImage: `url("/bg.png")`,
+          backgroundSize: "cover",
           minHeight: "90vh",
-          paddingTop: "40px",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
         }}
       >
-        <Grid container justifyContent="center">
-          <Card style={{ width: 400, padding: 20 }}>
-            
-            {/* Image preview */}
+        <Card style={{ width: 450, padding: 20 }}>
+          <CardContent style={{ textAlign: "center" }}>
+
+            {/* DROPZONE */}
+            {!preview && (
+              <div
+                {...getRootProps()}
+                style={{
+                  border: "2px dashed #ccc",
+                  padding: 40,
+                  cursor: "pointer",
+                }}
+              >
+                <input {...getInputProps()} />
+                <Typography>
+                  Drag & drop potato leaf image here
+                </Typography>
+              </div>
+            )}
+
+            {/* PREVIEW */}
             {preview && (
-              <CardMedia
-                component="img"
-                height="300"
-                image={preview}
+              <img
+                src={preview}
                 alt="preview"
+                style={{ width: "100%", borderRadius: 10 }}
               />
             )}
 
-            <CardContent style={{ textAlign: "center" }}>
-              
-              {/* Upload */}
-              <input type="file" onChange={handleFileChange} />
+            <br /><br />
 
-              <br /><br />
+            {/* LOADING */}
+            {loading && (
+              <>
+                <CircularProgress />
+                <Typography>Processing...</Typography>
+              </>
+            )}
 
-              {/* Clear button */}
-              <Button variant="contained" onClick={clearData}>
+            {/* RESULT */}
+            {data && (
+              <div>
+                <Typography variant="h6">
+                  Label: {data.class}
+                </Typography>
+                <Typography>
+                  Confidence: {(data.confidence * 100).toFixed(2)}%
+                </Typography>
+              </div>
+            )}
+
+            <br />
+
+            {/* CLEAR */}
+            {preview && (
+              <Button
+                variant="contained"
+                onClick={() => {
+                  setFile(null);
+                  setPreview(null);
+                  setData(null);
+                }}
+              >
                 Clear
               </Button>
-
-              <br /><br />
-
-              {/* Loading */}
-              {isLoading && (
-                <div>
-                  <CircularProgress />
-                  <Typography>Processing...</Typography>
-                </div>
-              )}
-
-              {/* RESULT ✅ */}
-              {data && (
-                <div>
-                  <h2>Label: {data.class}</h2>
-                  <h3>
-                    Confidence: {(data.confidence * 100).toFixed(2)}%
-                  </h3>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </Grid>
+            )}
+          </CardContent>
+        </Card>
       </Container>
     </div>
   );
 };
+``
