@@ -7,6 +7,12 @@ from PIL import Image
 import tensorflow as tf
 import os
 
+
+from tensorflow.keras.preprocessing import image
+
+
+
+
 app = FastAPI()
 
 # ✅ CORS (ONLY ONE BLOCK)
@@ -36,12 +42,27 @@ async def ping():
     return {"message": "API working"}
 
 # ✅ IMAGE PROCESS
-def read_file_as_image(data) -> np.ndarray:
+'''def read_file_as_image(data) -> np.ndarray:
     image = Image.open(BytesIO(data))
     image = image.convert("RGB")
     image = image.resize((256, 256))   # ✅ IMPORTANT
     image = np.array(image) / 255.0
-    return image
+    return image'''
+
+
+
+
+def read_file_as_image(data) -> np.ndarray:
+    img = Image.open(BytesIO(data)).convert("RGB")
+    img = img.resize((256, 256))
+
+    img_array = image.img_to_array(img)   # ✅ correct conversion
+    img_array = img_array / 255.0         # ✅ same normalization as training
+
+    return img_array
+
+
+
 
 # ✅ PREDICT API
 @app.post("/predict")
