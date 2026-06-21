@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+/*import { useState, useEffect } from "react";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -284,5 +284,146 @@ export const ImageUpload = () => {
         </Grid >
       </Container >
     </React.Fragment >
+  );
+};*/
+
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import Avatar from "@mui/material/Avatar";
+import Container from "@mui/material/Container";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardMedia from "@mui/material/CardMedia";
+import Grid from "@mui/material/Grid";
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+
+import cblogo from "./cblogo.PNG";
+import bg from "./bg.png";
+
+export const ImageUpload = () => {
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const sendFile = async () => {
+    if (!selectedFile) return;
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    try {
+      const res = await axios.post(
+        process.env.REACT_APP_API_URL,
+        formData
+      );
+      setData(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    if (!selectedFile) return;
+
+    const objectUrl = URL.createObjectURL(selectedFile);
+    setPreview(objectUrl);
+  }, [selectedFile]);
+
+  useEffect(() => {
+    if (!preview) return;
+
+    setIsLoading(true);
+    sendFile();
+  }, [preview]);
+
+  const onchangeHandler = (event) => {
+    setSelectedFile(event.target.files[0]);
+    setData(null);
+  };
+
+  const clearData = () => {
+    setSelectedFile(null);
+    setPreview(null);
+    setData(null);
+  };
+
+  let confidence = "";
+  if (data) {
+    confidence = (data.confidence * 100).toFixed(2);
+  }
+
+  return (
+    <div>
+      {/* Top Bar */}
+      <AppBar position="static" style={{ background: "#be6a77" }}>
+        <Toolbar>
+          <Typography variant="h6">
+            Potato Disease Classification
+          </Typography>
+          <div style={{ flexGrow: 1 }} />
+          <Avatar src={cblogo}></Avatar>
+        </Toolbar>
+      </AppBar>
+
+      {/* Main Section */}
+      <Container
+        maxWidth={false}
+        style={{
+          backgroundImage: `url(${bg})`,
+          minHeight: "90vh",
+          paddingTop: "50px",
+        }}
+      >
+        <Grid container justifyContent="center">
+          <Card style={{ width: 400, padding: 20 }}>
+            {/* Image Preview */}
+            {preview && (
+              <CardMedia
+                component="img"
+                height="300"
+                image={preview}
+                alt="preview"
+              />
+            )}
+
+            <CardContent style={{ textAlign: "center" }}>
+              <input type="file" onChange={onchangeHandler} />
+
+              <br /><br />
+
+              <Button
+                variant="contained"
+                onClick={clearData}
+              >
+                Clear
+              </Button>
+
+              {/* Loader */}
+              {isLoading && (
+                <div>
+                  <CircularProgress />
+                  <Typography>Processing...</Typography>
+                </div>
+              )}
+
+              {/* Result */}
+              {data && (
+                <div>
+                  <h2>{data.class}</h2>
+                  <h3>{confidence}%</h3>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+      </Container>
+    </div>
   );
 };
