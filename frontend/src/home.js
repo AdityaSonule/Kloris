@@ -102,23 +102,36 @@ export const ImageUpload = () => {
       <Container
         maxWidth={false}
         style={{
-          backgroundImage: `url(${image})`,
-          backgroundSize: "cover",
-          minHeight: "93vh",
-          paddingTop: "30px"
+        backgroundImage: `url(${image})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        minHeight: "100vh",
+
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
         }}
       >
+
         <Grid container justifyContent="center">
           <Grid item xs={12}>
             <Card
               style={{
-                margin: "auto",
-                maxWidth: 400,
-                height: imageUploaded ? 500 : "auto",
-                borderRadius: 15,
-                boxShadow: "0px 9px 70px rgba(0,0,0,0.3)"
+              width: 400,
+              padding: 20,
+              borderRadius: 20,
+
+              // ✅ GLASS EFFECT
+              background: "rgba(255, 255, 255, 0.15)",
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)",
+
+              border: "1px solid rgba(255,255,255,0.3)",
+              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
+
+              color: "white"
               }}
-            >
+        >
               {/* IMAGE */}
               {imageUploaded && (
                 <img
@@ -135,17 +148,21 @@ export const ImageUpload = () => {
               {/* UPLOAD */}
               {!imageUploaded && (
                 <CardContent>
+                  
                   <div
                     {...getRootProps()}
                     style={{
-                      border: "2px dashed #aaa",
-                      padding: 30,
-                      textAlign: "center",
-                      cursor: "pointer"
+                    border: "2px dashed rgba(255,255,255,0.5)",
+                    padding: 40,
+                    textAlign: "center",
+                    cursor: "pointer",
+                    borderRadius: 10,
+                    color: "white",
                     }}
                   >
+
                     <input {...getInputProps()} />
-                    <Typography>
+                    <Typography style={{ color: "white" }}>
                       Drag & drop an image of a potato leaf
                     </Typography>
                   </div>
@@ -155,12 +172,18 @@ export const ImageUpload = () => {
               {/* RESULT */}
               {data && (
                 <CardContent style={{ textAlign: "center" }}>
-                  <TableContainer component={Paper}>
+                  <TableContainer
+                    component={Paper}
+                    style={{
+                    background: "transparent",
+                    boxShadow: "none",
+                    }}
+                  >
                     <Table size="small">
                       <TableHead>
                         <TableRow>
                           <TableCell>Label</TableCell>
-                          <TableCell align="right">
+                          <TableCell style={{ color: "white" }}>
                             Confidence
                           </TableCell>
                         </TableRow>
