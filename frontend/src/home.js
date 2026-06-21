@@ -201,6 +201,18 @@ export const ImageUpload = () => {
                       </TableBody>
                     </Table>
                   </TableContainer>
+                  {data && (
+  <div style={{ marginTop: "20px", textAlign: "center" }}>
+    <Button
+      variant="contained"
+      onClick={clearData}
+      startIcon={<ClearIcon />}
+      style={{ borderRadius: "20px" }}
+    >
+      Clear
+    </Button>
+  </div>
+)}
                 </CardContent>
               )}
 
@@ -215,17 +227,6 @@ export const ImageUpload = () => {
           </Grid>
 
           {/* CLEAR BUTTON */}
-          {data && (
-            <Grid item style={{ marginTop: 20 }}>
-              <Button
-                variant="contained"
-                onClick={clearData}
-                startIcon={<ClearIcon />}
-              >
-                Clear
-              </Button>
-            </Grid>
-          )}
         </Grid>
       </Container>
     </>
