@@ -100,21 +100,24 @@ export const ImageUpload = () => {
 
       {/* MAIN */}
       <Container
-        maxWidth={false}
-        style={{
-        backgroundImage: `url(${image})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        minHeight: "100vh",
+  maxWidth={false}
+  disableGutters
+  style={{
+    backgroundImage: `url(${image})`,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    height: "100vh",
 
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        }}
-      >
+    display: "flex",
+    justifyContent: "center",   // horizontal center ✅
+    alignItems: "center",       // vertical center ✅
+  }}
+>
 
-        <Grid container justifyContent="center">
-          <Grid item xs={12}>
+        
+<Grid container justifyContent="center" alignItems="center" style={{ height: "100vh" }}>
+  <Grid item>
+
             <Card
               style={{
               width: 400,
