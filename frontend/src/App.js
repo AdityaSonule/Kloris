@@ -1,4 +1,4 @@
-import logo from './logo.svg';
+/*import logo from './logo.svg';
 import './App.css';
 
 function App() {
@@ -20,6 +20,14 @@ function App() {
       </header>
     </div>
   );
+}
+
+export default App;*/
+
+import { ImageUpload } from "./home.js";
+
+function App() {
+  return <ImageUpload />;
 }
 
 export default App;
