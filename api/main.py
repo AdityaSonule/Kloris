@@ -7,8 +7,6 @@ from PIL import Image
 import tensorflow as tf
 import os
 
-from tensorflow.keras.utils import img_to_array
-
 
 # ✅ CREATE APP
 app = FastAPI()
@@ -29,9 +27,15 @@ app.add_middleware(
 
 # ✅ MODEL PATH
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, "..", "saved_models", "1")
+models_dir = os.path.join(BASE_DIR, "..", "saved_models")
 
-# ✅ LOAD MODEL (FIXED FOR SAVEDMODEL)
+# get all version folders
+versions = [int(v) for v in os.listdir(models_dir) if v.isdigit()]
+
+latest_version = str(max(versions))
+
+MODEL_PATH = os.path.join(models_dir, latest_version)
+# ✅ LOAD SAVEDMODEL (NO keras)
 MODEL = tf.saved_model.load(MODEL_PATH)
 
 # ✅ GET INFERENCE FUNCTION
@@ -46,27 +50,25 @@ async def ping():
     return {"message": "API working"}
 
 
-# ✅ IMAGE PREPROCESSING
+# ✅ IMAGE PREPROCESSING (PURE NUMPY, NO keras)
 def read_file_as_image(data) -> np.ndarray:
     img = Image.open(BytesIO(data)).convert("RGB")
     img = img.resize((256, 256))
 
-    img_array = img_to_array(img)
-    img_array = img_array / 255.0
-
+    img_array = np.array(img).astype("float32") / 255.0  # ✅ clean
     return img_array
 
 
-# ✅ PREDICTION API (FIXED PROPERLY)
+# ✅ PREDICTION API
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
     img = read_file_as_image(await file.read())
     img_batch = np.expand_dims(img, 0)
 
-    # ✅ USE SIGNATURE FUNCTION
+    # ✅ run inference
     prediction = infer(tf.constant(img_batch))
 
-    # ✅ EXTRACT OUTPUT
+    # ✅ extract output
     prediction = list(prediction.values())[0].numpy()
 
     predicted_class = CLASS_NAMES[np.argmax(prediction[0])]
