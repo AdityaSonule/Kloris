@@ -34,7 +34,7 @@ export const ImageUpload = () => {
   const [imageUploaded, setImageUploaded] = useState(false);
   const [isLoading, setIsloading] = useState(false);
 
-  // ✅ Dropzone
+ 
   const onDrop = (acceptedFiles) => {
     const file = acceptedFiles[0];
     setSelectedFile(file);
@@ -48,7 +48,7 @@ export const ImageUpload = () => {
     onDrop,
   });
 
-  // ✅ Send to backend
+  
   useEffect(() => {
     const sendFile = async () => {
       if (!selectedFile) return;
@@ -100,19 +100,19 @@ export const ImageUpload = () => {
 
       {/* MAIN */}
       <Container
-  maxWidth={false}
-  disableGutters
-  style={{
-    backgroundImage: `url(${image})`,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    height: "100vh",
+        maxWidth={false}
+        disableGutters
+          style={{
+            backgroundImage: `url(${image})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            height: "100vh",
 
-    display: "flex",
-    justifyContent: "center",   // horizontal center ✅
-    alignItems: "center",       // vertical center ✅
-  }}
->
+            display: "flex",
+            justifyContent: "center",  
+            alignItems: "center",      
+        }}
+    >
 
         
 <Grid container justifyContent="center" alignItems="center" style={{ height: "100vh" }}>
@@ -120,21 +120,21 @@ export const ImageUpload = () => {
 
             <Card
               style={{
-              width: 400,
-              padding: 20,
-              borderRadius: 20,
+                width: 400,
+                padding: 20,
+                borderRadius: 20,
 
-              // ✅ GLASS EFFECT
-              background: "rgba(255, 255, 255, 0.15)",
-              backdropFilter: "blur(12px)",
-              WebkitBackdropFilter: "blur(12px)",
+            
+                background: "rgba(255, 255, 255, 0.15)",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
 
-              border: "1px solid rgba(255,255,255,0.3)",
-              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
+                border: "1px solid rgba(255,255,255,0.3)",
+                boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
 
-              color: "white"
+                color: "white"
               }}
-        >
+            >
               {/* IMAGE */}
               {imageUploaded && (
                 <img
